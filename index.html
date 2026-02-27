@@ -3,125 +3,110 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Windows - Poetic Blind Archive</title>
+    <title>Windows - Transparent & Opaque Blind</title>
     <style>
         :root {
-            --glass-bg: rgba(30, 30, 30, 0.3); /* 이미지 감성에 맞춘 어두운 반투명 */
             --btn-bg: rgba(255, 255, 255, 0.15);
             --text-color: rgba(255, 255, 255, 0.95);
         }
 
         body {
             margin: 0; padding: 0;
-            background-color: #111;
+            background-color: transparent; /* 사이트 전체 완전 투명 */
             font-family: 'Pretendard', 'Apple SD Gothic Neo', sans-serif;
             min-height: 100vh;
             display: flex; flex-direction: column; align-items: center;
         }
 
-        /* 🌆 전체 배경 사진 */
+        /* 🌆 전체 배경 사진 (선명도 100%) */
         .site-bg {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background-size: cover; background-position: center;
-            opacity: 0.5; z-index: -2;
+            opacity: 1; z-index: -2;
             transition: background-image 0.8s ease;
         }
 
-        /* 🌑 배경 관리 메뉴 */
+        /* 🌑 하단 관리 메뉴 */
         .bg-admin {
             position: fixed; bottom: 20px; right: 20px;
-            z-index: 1000; display: flex; gap: 8px;
+            z-index: 1000; display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end;
+            max-width: 300px;
         }
         .bg-admin label, .bg-admin button {
             cursor: pointer; background: var(--btn-bg);
-            color: rgba(255, 255, 255, 0.7); font-size: 11px;
+            color: rgba(255, 255, 255, 0.9); font-size: 11px;
             padding: 8px 14px; border-radius: 4px;
             backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
-            border: 1px solid rgba(255,255,255,0.1); outline: none;
+            border: 1px solid rgba(255,255,255,0.2); outline: none;
         }
+        .bg-admin .danger-btn { color: #ff8a80; border-color: rgba(255,138,128,0.4); }
 
-        /* 🪟 갤러리 그리드 (2열 구조) */
+        /* 🪟 갤러리 그리드 (2열) */
         .gallery-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 20px;
-            width: 100%; max-width: 600px; /* 모바일/태블릿 보기 좋은 사이즈 */
+            display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px;
+            width: 100%; max-width: 600px; 
             padding: 60px 20px 120px 20px; 
             box-sizing: border-box; z-index: 10;
         }
 
-        /* 🃏 개별 카드 (게시판) */
+        /* 🃏 개별 카드 (블라인드가 없을 땐 완전 투명하게) */
         .card {
-            position: relative;
-            width: 100%;
-            aspect-ratio: 3 / 4.5; /* 세로로 긴 시적인 비율 */
-            border-radius: 6px;
-            overflow: hidden;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-            background: #222;
+            position: relative; width: 100%; aspect-ratio: 3 / 4.5; 
+            border-radius: 6px; overflow: hidden;
+            box-shadow: none; /* 그림자 완벽 제거 */
+            background: transparent; /* 배경색 완벽 제거 */
+            border: 1px solid rgba(255, 255, 255, 0.05); /* 위치 파악을 위한 아주 옅은 선 */
         }
 
-        /* 📸 레이어 1: 맨 밑의 사진 */
-        .photo-layer {
-            position: absolute; inset: 0; z-index: 1;
-        }
-        .photo-layer img {
-            width: 100%; height: 100%; object-fit: cover;
-        }
+        /* 📸 사진 레이어 (검은 배경 제거, 투명) */
+        .photo-layer { position: absolute; inset: 0; z-index: 1; background: transparent; }
+        .photo-layer img { width: 100%; height: 100%; object-fit: cover; }
 
-        /* 🌫️ 레이어 2: 블라인드 (글 쓰는 반투명 영역) */
+        /* ⬛ 블라인드 레이어 (완전 불투명) */
         .blind-layer {
             position: absolute; inset: 0; z-index: 2;
-            background: linear-gradient(to bottom, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.5) 100%);
-            backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
-            display: flex; flex-direction: column; justify-content: flex-end; /* 글씨가 아래로 가도록 */
+            background-color: #121212; /* 완전한 불투명 다크 색상 */
+            display: flex; flex-direction: column; justify-content: flex-end; 
             padding: 25px 20px;
-            transition: transform 0.7s cubic-bezier(0.65, 0, 0.15, 1); /* 스르륵 올라가는 애니메이션 */
-            border-bottom: 2px solid rgba(255,255,255,0.2); /* 블라인드 끝자락 느낌 */
+            transition: transform 0.7s cubic-bezier(0.65, 0, 0.15, 1); 
+            border-bottom: 2px solid rgba(255,255,255,0.1); 
         }
 
-        /* 🔼 블라인드가 올라간 상태 */
-        .card.lifted .blind-layer {
-            transform: translateY(-100%); /* 위로 완전히 말려 올라감 */
-        }
+        .card.lifted .blind-layer { transform: translateY(-100%); }
 
-        /* 📜 텍스트 에디터 */
         .blind-layer h3 {
             margin: 0 0 10px 0; font-size: 1.1em; color: var(--text-color);
-            font-weight: 600; text-shadow: 0 2px 4px rgba(0,0,0,0.6); outline: none;
+            font-weight: 600; outline: none;
         }
         .blind-layer p {
             margin: 0; font-size: 0.95em; line-height: 1.6; color: rgba(255,255,255,0.85);
-            text-shadow: 0 2px 4px rgba(0,0,0,0.6); outline: none; white-space: pre-wrap;
+            outline: none; white-space: pre-wrap;
             max-height: 150px; overflow-y: auto;
         }
 
-        /* 🔘 작고 반투명한 버튼 그룹 (최상단) */
+        /* 🔘 반투명 버튼 그룹 */
         .btn-group {
             position: absolute; top: 10px; right: 10px; z-index: 10;
             display: flex; gap: 4px; flex-wrap: wrap; justify-content: flex-end; width: 80%;
             opacity: 0.2; transition: opacity 0.3s;
         }
-        .card:hover .btn-group { opacity: 1; } /* 마우스 올리면 버튼 보임 */
+        .card:hover .btn-group, .card:active .btn-group { opacity: 1; } 
 
         .mini-btn {
-            background: var(--btn-bg); border: 1px solid rgba(255,255,255,0.1);
-            color: rgba(255,255,255,0.9); font-size: 10px; padding: 4px 8px;
-            border-radius: 4px; cursor: pointer; backdrop-filter: blur(4px);
+            background: rgba(0,0,0,0.6); border: 1px solid rgba(255,255,255,0.2);
+            color: rgba(255,255,255,0.9); font-size: 10px; padding: 5px 9px;
+            border-radius: 4px; cursor: pointer; 
         }
-        .mini-btn:hover { background: rgba(255,255,255,0.3); }
+        .mini-btn:hover { background: rgba(255,255,255,0.2); }
 
-        /* ➕ 창문 세트 추가 버튼 */
         .add-btn {
-            background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.1);
+            background: rgba(0,0,0,0.7); border: 1px solid rgba(255,255,255,0.3);
             color: #fff; padding: 12px 40px; border-radius: 30px; cursor: pointer;
-            font-size: 13px; letter-spacing: 1px; backdrop-filter: blur(10px);
-            margin-bottom: 50px;
+            font-size: 13px; letter-spacing: 1px;
+            margin-bottom: 50px; box-shadow: 0 5px 15px rgba(0,0,0,0.5);
         }
 
         input[type="file"] { display: none; }
-        
-        /* 스크롤바 커스텀 */
         ::-webkit-scrollbar { width: 4px; }
         ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.3); border-radius: 4px; }
     </style>
@@ -133,6 +118,7 @@
 <div class="bg-admin">
     <label for="bgUpload">배경 변경</label>
     <button onclick="fixBg()">배경 고정</button>
+    <button class="danger-btn" onclick="hardReset()">🧹 전체 초기화</button>
     <input type="file" id="bgUpload" accept="image/*">
 </div>
 
@@ -144,16 +130,44 @@
     const grid = document.getElementById('mainGrid');
     const bgLayer = document.getElementById('bgLayer');
 
-    // 1. 배경 고정 관리
+    // 🔧 이미지 자동 압축 함수 (Canvas 활용 - 용량 초과 완벽 방지)
+    function compressImage(file, maxWidth, quality, callback) {
+        const reader = new FileReader();
+        reader.onload = function(event) {
+            const img = new Image();
+            img.onload = function() {
+                const canvas = document.createElement('canvas');
+                let width = img.width;
+                let height = img.height;
+
+                if (width > maxWidth) {
+                    height = Math.round((height *= maxWidth / width));
+                    width = maxWidth;
+                }
+
+                canvas.width = width;
+                canvas.height = height;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0, width, height);
+                
+                const compressedDataUrl = canvas.toDataURL('image/jpeg', quality);
+                callback(compressedDataUrl);
+            };
+            img.src = event.target.result;
+        };
+        reader.readAsDataURL(file);
+    }
+
+    // 1. 배경 설정
     const savedBg = localStorage.getItem('blind-bg-fixed');
     if (savedBg) bgLayer.style.backgroundImage = `url(${savedBg})`;
 
     document.getElementById('bgUpload').addEventListener('change', (e) => {
         const file = e.target.files[0];
         if (file) {
-            const reader = new FileReader();
-            reader.onload = (ev) => { bgLayer.style.backgroundImage = `url(${ev.target.result})`; };
-            reader.readAsDataURL(file);
+            compressImage(file, 1200, 0.7, (compressedUrl) => {
+                bgLayer.style.backgroundImage = `url(${compressedUrl})`;
+            });
         }
     });
 
@@ -164,11 +178,11 @@
             try {
                 localStorage.setItem('blind-bg-fixed', url);
                 alert('배경이 고정되었습니다.');
-            } catch(e) { alert('용량 초과로 저장할 수 없습니다.'); }
+            } catch(e) { alert('용량 초과로 저장할 수 없습니다. (전체 초기화 권장)'); }
         }
     }
 
-    // 2. 게시판(카드) 리스트 관리
+    // 2. 게시판 리스트 관리
     let boardList = JSON.parse(localStorage.getItem('blind-board-list')) || [1, 2, 3, 4];
     let nextId = parseInt(localStorage.getItem('blind-next-id')) || 5;
 
@@ -193,13 +207,10 @@
                 <button class="mini-btn" onclick="saveData(${id}, event)">고정</button>
                 <button class="mini-btn" onclick="deleteBoard(${id}, event)">삭제</button>
             </div>
-            
             <input type="file" id="file-${id}" accept="image/*">
-            
             <div class="photo-layer">
                 <img src="${saved.img}" id="img-${id}" style="${saved.img ? 'display:block' : 'display:none'}">
             </div>
-            
             <div class="blind-layer" onclick="event.stopPropagation()">
                 <h3 contenteditable="true" id="title-${id}">${saved.title}</h3>
                 <p contenteditable="true" id="text-${id}">${saved.text}</p>
@@ -208,17 +219,15 @@
 
         grid.appendChild(card);
 
-        // 사진 업로드 처리
+        // 사진 첨부 시 자동 압축
         document.getElementById(`file-${id}`).addEventListener('change', (e) => {
             const file = e.target.files[0];
             if (file) {
-                const reader = new FileReader();
-                reader.onload = (ev) => {
+                compressImage(file, 800, 0.6, (compressedUrl) => {
                     const img = document.getElementById(`img-${id}`);
-                    img.src = ev.target.result;
+                    img.src = compressedUrl;
                     img.style.display = 'block';
-                };
-                reader.readAsDataURL(file);
+                });
             }
         });
     }
@@ -235,7 +244,7 @@
         document.getElementById(`file-${id}`).click();
     }
 
-    // ✍️ 수정 (제목에 포커스)
+    // ✍️ 수정
     function editContent(id, e) {
         e.stopPropagation();
         const card = document.getElementById(`card-${id}`);
@@ -243,7 +252,7 @@
         document.getElementById(`title-${id}`).focus();
     }
 
-    // 💾 데이터 고정
+    // 💾 고정(저장)
     function saveData(id, e) {
         e.stopPropagation();
         const imgEl = document.getElementById(`img-${id}`);
@@ -255,11 +264,11 @@
             localStorage.setItem(`blind-data-${id}`, JSON.stringify({ title, text, img }));
             alert('기억이 고정되었습니다.');
         } catch(err) {
-            alert('저장 용량이 부족합니다. 사진 크기를 줄여주세요.');
+            alert('저장 용량이 부족합니다. 하단의 [🧹 전체 초기화]를 눌러주세요.');
         }
     }
 
-    // 🗑️ 게시판 삭제
+    // 🗑️ 삭제
     function deleteBoard(id, e) {
         e.stopPropagation();
         if(confirm('이 기록을 지우시겠습니까?')) {
@@ -270,7 +279,7 @@
         }
     }
 
-    // ➕ 새로운 카드 세트 추가
+    // ➕ 추가
     function addPair() {
         const id1 = nextId++;
         const id2 = nextId++;
@@ -280,6 +289,14 @@
         createBoard(id1);
         createBoard(id2);
         window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+    }
+
+    // 🚨 초기화
+    function hardReset() {
+        if(confirm('주의! 저장된 모든 사진과 글, 배경이 삭제됩니다. 초기화하시겠습니까?')) {
+            localStorage.clear();
+            location.reload();
+        }
     }
 
     render();
