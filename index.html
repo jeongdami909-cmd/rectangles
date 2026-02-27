@@ -49,11 +49,11 @@
         }
         .bg-admin .danger-btn { color: #ff8a80; border-color: rgba(255,138,128,0.4); }
 
-        /* 🪟 갤러리 그리드 */
+        /* 🪟 갤러리 그리드 - 💡 기존 55vh에서 80vh로 내려 하단 배치를 강화함 */
         .gallery-grid {
             display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px;
             width: 100%; max-width: 600px; 
-            padding: 55vh 20px 120px 20px;
+            padding: 80vh 20px 120px 20px; 
             box-sizing: border-box; z-index: 10;
         }
 
@@ -258,7 +258,6 @@
     }
     function hardReset() { if(confirm('전체 초기화하시겠습니까?')) { localStorage.clear(); location.reload(); } }
 
-    // ❄️🌧️🌸✨🌹 업그레이드 날씨 엔진
     let particles = [];
     let weatherType = 'none';
 
@@ -285,7 +284,6 @@
         }
         update() {
             if (weatherType === 'stars') {
-                // 별빛: 제자리에서 반짝이거나 아주 미세하게 이동
                 this.opacity += this.twinkleSpeed;
                 if (this.opacity > 0.8 || this.opacity < 0.2) this.twinkleSpeed *= -1;
                 this.y += 0.1; 
@@ -293,20 +291,13 @@
                 this.y += this.velY;
                 this.x += this.velX;
             }
-
-            if (weatherType === 'snow') {
-                this.velX = Math.sin(this.y * 0.01) * 0.5;
-            } else if (weatherType === 'rain') {
-                this.velY = this.speed * 5;
-            } else if (weatherType === 'petals' || weatherType === 'rose') {
+            if (weatherType === 'snow') { this.velX = Math.sin(this.y * 0.01) * 0.5; }
+            else if (weatherType === 'rain') { this.velY = this.speed * 5; }
+            else if (weatherType === 'petals' || weatherType === 'rose') {
                 this.velX = Math.cos(this.y * 0.005) * 1.5;
                 this.angle += this.spin;
             }
-
-            if (this.y > canvas.height) {
-                this.y = -10;
-                this.x = Math.random() * canvas.width;
-            }
+            if (this.y > canvas.height) { this.y = -10; this.x = Math.random() * canvas.width; }
         }
         draw() {
             ctx.beginPath();
@@ -316,18 +307,11 @@
                 ctx.fill();
             } else if (weatherType === 'rain') {
                 ctx.strokeStyle = `rgba(255, 255, 255, 0.2)`;
-                ctx.moveTo(this.x, this.y);
-                ctx.lineTo(this.x, this.y + 10);
-                ctx.stroke();
+                ctx.moveTo(this.x, this.y); ctx.lineTo(this.x, this.y + 10); ctx.stroke();
             } else if (weatherType === 'petals' || weatherType === 'rose') {
-                ctx.save();
-                ctx.translate(this.x, this.y);
-                ctx.rotate(this.angle * Math.PI / 180);
-                // 장미는 진한 빨강, 꽃잎은 연분홍
+                ctx.save(); ctx.translate(this.x, this.y); ctx.rotate(this.angle * Math.PI / 180);
                 ctx.fillStyle = weatherType === 'rose' ? `rgba(180, 0, 0, ${this.opacity})` : `rgba(255, 182, 193, ${this.opacity})`;
-                ctx.ellipse(0, 0, this.size * 2, this.size, 0, 0, Math.PI * 2);
-                ctx.fill();
-                ctx.restore();
+                ctx.ellipse(0, 0, this.size * 2, this.size, 0, 0, Math.PI * 2); ctx.fill(); ctx.restore();
             }
         }
     }
@@ -338,26 +322,20 @@
         if (type === 'none') return;
         let count = (type === 'rain' || type === 'stars') ? 150 : 80;
         for (let i = 0; i < count; i++) { particles.push(new Particle()); }
-        // 💡 날씨 고정: 로컬스토리지 저장
         localStorage.setItem('blind-weather-type', type);
     }
 
     function animate() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
-        if (weatherType !== 'none') {
-            particles.forEach(p => { p.update(); p.draw(); });
-        }
+        if (weatherType !== 'none') { particles.forEach(p => { p.update(); p.draw(); }); }
         requestAnimationFrame(animate);
     }
 
-    // 💡 초기 실행: 저장된 날씨 불러오기
     const savedWeather = localStorage.getItem('blind-weather-type') || 'none';
     document.getElementById('weatherSelect').value = savedWeather;
     initWeather(savedWeather);
 
-    document.getElementById('weatherSelect').addEventListener('change', (e) => {
-        initWeather(e.target.value);
-    });
+    document.getElementById('weatherSelect').addEventListener('change', (e) => { initWeather(e.target.value); });
 
     render();
     animate();
