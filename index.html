@@ -41,11 +41,11 @@
         }
         .bg-admin .danger-btn { color: #ff8a80; border-color: rgba(255,138,128,0.4); }
 
-        /* 🪟 갤러리 그리드 (2열) */
+        /* 🪟 갤러리 그리드 (2열) - 배경이 잘 보이도록 상단 여백 250px로 대폭 확대 */
         .gallery-grid {
             display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px;
             width: 100%; max-width: 600px; 
-            padding: 60px 20px 120px 20px; 
+            padding: 250px 20px 120px 20px; /* 기존 60px -> 250px */
             box-sizing: border-box; z-index: 10;
         }
 
