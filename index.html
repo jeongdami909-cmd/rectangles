@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Windows - Light Gray Frosted Blind (Weather Edition)</title>
+    <title>Windows - Light Gray Frosted Blind (Weather Edition Pro)</title>
     <style>
         :root {
             --indigo: #3f51b5;
@@ -30,7 +30,7 @@
         /* ❄️ 날씨 애니메이션 캔버스 레이어 */
         #weather-canvas {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            pointer-events: none; /* 클릭 방해 금지 */
+            pointer-events: none; 
             z-index: -1;
         }
 
@@ -126,6 +126,8 @@
         <option value="snow">❄️ 눈 내리는 날</option>
         <option value="rain">🌧️ 비 오는 날</option>
         <option value="petals">🌸 꽃잎 휘날리는 날</option>
+        <option value="stars">✨ 별빛 반짝이는 밤</option>
+        <option value="rose">🌹 장미 휘날리는 날</option>
     </select>
     <label for="bgUpload">배경 변경</label>
     <button class="danger-btn" onclick="hardReset()">🧹 전체 초기화</button>
@@ -141,7 +143,6 @@
     const canvas = document.getElementById('weather-canvas');
     const ctx = canvas.getContext('2d');
 
-    // 🔧 이미지 자동 압축 함수
     function compressImage(file, maxWidth, quality, callback) {
         const reader = new FileReader();
         reader.onload = function(event) {
@@ -166,7 +167,6 @@
         reader.readAsDataURL(file);
     }
 
-    // 1. 배경 설정
     const savedBg = localStorage.getItem('blind-bg-fixed');
     if (savedBg) bgLayer.style.backgroundImage = `url(${savedBg})`;
 
@@ -177,14 +177,11 @@
                 bgLayer.style.backgroundImage = `url(${compressedUrl})`;
                 try {
                     localStorage.setItem('blind-bg-fixed', compressedUrl);
-                } catch(err) {
-                    alert('저장 공간이 부족합니다.');
-                }
+                } catch(err) { alert('저장 공간 부족'); }
             });
         }
     });
 
-    // 2. 게시판 리스트 관리
     let boardList = JSON.parse(localStorage.getItem('blind-board-list')) || [1, 2, 3, 4];
     let nextId = parseInt(localStorage.getItem('blind-next-id')) || 5;
 
@@ -261,7 +258,7 @@
     }
     function hardReset() { if(confirm('전체 초기화하시겠습니까?')) { localStorage.clear(); location.reload(); } }
 
-    // ❄️🌧️🌸 날씨 엔진 (Weather Engine) 
+    // ❄️🌧️🌸✨🌹 업그레이드 날씨 엔진
     let particles = [];
     let weatherType = 'none';
 
@@ -273,54 +270,61 @@
     resize();
 
     class Particle {
-        constructor() {
-            this.reset();
-        }
+        constructor() { this.reset(); }
         reset() {
             this.x = Math.random() * canvas.width;
-            this.y = Math.random() * canvas.height - canvas.height;
+            this.y = Math.random() * canvas.height;
             this.size = Math.random() * 3 + 1;
-            this.speed = Math.random() * 2 + 1;
+            this.speed = Math.random() * 2 + 0.5;
             this.velY = this.speed;
             this.velX = Math.random() * 1 - 0.5;
             this.opacity = Math.random() * 0.5 + 0.3;
-            // 꽃잎용 속성
             this.angle = Math.random() * 360;
             this.spin = Math.random() * 2 - 1;
+            this.twinkleSpeed = Math.random() * 0.02 + 0.01;
         }
         update() {
-            this.y += this.velY;
-            this.x += this.velX;
+            if (weatherType === 'stars') {
+                // 별빛: 제자리에서 반짝이거나 아주 미세하게 이동
+                this.opacity += this.twinkleSpeed;
+                if (this.opacity > 0.8 || this.opacity < 0.2) this.twinkleSpeed *= -1;
+                this.y += 0.1; 
+            } else {
+                this.y += this.velY;
+                this.x += this.velX;
+            }
 
             if (weatherType === 'snow') {
                 this.velX = Math.sin(this.y * 0.01) * 0.5;
             } else if (weatherType === 'rain') {
                 this.velY = this.speed * 5;
-                this.velX = 0;
-            } else if (weatherType === 'petals') {
+            } else if (weatherType === 'petals' || weatherType === 'rose') {
                 this.velX = Math.cos(this.y * 0.005) * 1.5;
                 this.angle += this.spin;
             }
 
-            if (this.y > canvas.height) this.reset();
+            if (this.y > canvas.height) {
+                this.y = -10;
+                this.x = Math.random() * canvas.width;
+            }
         }
         draw() {
-            ctx.fillStyle = `rgba(255, 255, 255, ${this.opacity})`;
             ctx.beginPath();
-            if (weatherType === 'snow') {
-                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+            if (weatherType === 'snow' || weatherType === 'stars') {
+                ctx.fillStyle = `rgba(255, 255, 255, ${this.opacity})`;
+                ctx.arc(this.x, this.y, this.size / (weatherType === 'stars' ? 1.5 : 1), 0, Math.PI * 2);
                 ctx.fill();
             } else if (weatherType === 'rain') {
                 ctx.strokeStyle = `rgba(255, 255, 255, 0.2)`;
-                ctx.lineWidth = 1;
                 ctx.moveTo(this.x, this.y);
                 ctx.lineTo(this.x, this.y + 10);
                 ctx.stroke();
-            } else if (weatherType === 'petals') {
+            } else if (weatherType === 'petals' || weatherType === 'rose') {
                 ctx.save();
                 ctx.translate(this.x, this.y);
                 ctx.rotate(this.angle * Math.PI / 180);
-                ctx.fillStyle = `rgba(255, 182, 193, ${this.opacity})`; // 연분홍
+                // 장미는 진한 빨강, 꽃잎은 연분홍
+                ctx.fillStyle = weatherType === 'rose' ? `rgba(180, 0, 0, ${this.opacity})` : `rgba(255, 182, 193, ${this.opacity})`;
                 ctx.ellipse(0, 0, this.size * 2, this.size, 0, 0, Math.PI * 2);
                 ctx.fill();
                 ctx.restore();
@@ -332,22 +336,24 @@
         weatherType = type;
         particles = [];
         if (type === 'none') return;
-        let count = type === 'rain' ? 200 : 100;
-        for (let i = 0; i < count; i++) {
-            particles.push(new Particle());
-        }
+        let count = (type === 'rain' || type === 'stars') ? 150 : 80;
+        for (let i = 0; i < count; i++) { particles.push(new Particle()); }
+        // 💡 날씨 고정: 로컬스토리지 저장
+        localStorage.setItem('blind-weather-type', type);
     }
 
     function animate() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         if (weatherType !== 'none') {
-            particles.forEach(p => {
-                p.update();
-                p.draw();
-            });
+            particles.forEach(p => { p.update(); p.draw(); });
         }
         requestAnimationFrame(animate);
     }
+
+    // 💡 초기 실행: 저장된 날씨 불러오기
+    const savedWeather = localStorage.getItem('blind-weather-type') || 'none';
+    document.getElementById('weatherSelect').value = savedWeather;
+    initWeather(savedWeather);
 
     document.getElementById('weatherSelect').addEventListener('change', (e) => {
         initWeather(e.target.value);
