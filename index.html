@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Windows - Light Gray Frosted Blind (Weather Edition Pro)</title>
+    <title>Windows - Light Gray Frosted Blind (Subtle UI)</title>
     <style>
         :root {
             --indigo: #3f51b5;
@@ -34,22 +34,38 @@
             z-index: -1;
         }
 
-        /* 🌑 하단 관리 메뉴 */
+        /* 🌑 하단 관리 메뉴 - 💡 버튼 스타일을 투명하고 은은하게 수정 */
         .bg-admin {
             position: fixed; bottom: 20px; right: 20px;
             z-index: 1000; display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end;
             max-width: 350px;
         }
         .bg-admin label, .bg-admin button, .bg-admin select {
-            cursor: pointer; background: rgba(0, 0, 0, 0.5);
-            color: rgba(255, 255, 255, 0.9); font-size: 11px;
+            cursor: pointer; 
+            background: transparent; /* 바탕 완전 투명 */
+            color: rgba(255, 255, 255, 0.4); /* 글자 은은하게 */
+            font-size: 11px;
             padding: 8px 14px; border-radius: 4px;
-            backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
-            border: 1px solid rgba(255,255,255,0.2); outline: none;
+            backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
+            border: 1px solid rgba(255,255,255,0.15); /* 테두리도 은은하게 */
+            outline: none;
+            transition: all 0.3s ease;
         }
-        .bg-admin .danger-btn { color: #ff8a80; border-color: rgba(255,138,128,0.4); }
+        .bg-admin label:hover, .bg-admin button:hover, .bg-admin select:hover {
+            color: rgba(255, 255, 255, 0.9); /* 호버 시 선명하게 */
+            background: rgba(255, 255, 255, 0.05);
+            border-color: rgba(255,255,255,0.3);
+        }
+        .bg-admin .danger-btn { 
+            color: rgba(255, 138, 128, 0.4); 
+            border-color: rgba(255, 138, 128, 0.2); 
+        }
+        .bg-admin .danger-btn:hover {
+            color: rgba(255, 138, 128, 1);
+            border-color: rgba(255, 138, 128, 0.5);
+        }
 
-        /* 🪟 갤러리 그리드 - 💡 기존 55vh에서 80vh로 내려 하단 배치를 강화함 */
+        /* 🪟 갤러리 그리드 (기존 80vh 유지) */
         .gallery-grid {
             display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px;
             width: 100%; max-width: 600px; 
@@ -57,7 +73,7 @@
             box-sizing: border-box; z-index: 10;
         }
 
-        /* 🃏 개별 카드 */
+        /* 🃏 개별 카드 (기존 구조 유지) */
         .card {
             position: relative; width: 100%; aspect-ratio: 3 / 4.5; 
             border-radius: 6px; overflow: hidden;
@@ -105,7 +121,7 @@
 
         .add-btn {
             background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.3);
-            color: #fff; padding: 12px 40px; border-radius: 30px; cursor: pointer;
+            color: rgba(255, 255, 255, 0.7); padding: 12px 40px; border-radius: 30px; cursor: pointer;
             font-size: 13px; letter-spacing: 1px; backdrop-filter: blur(8px);
             margin-bottom: 50px; box-shadow: 0 5px 15px rgba(0,0,0,0.3); z-index: 100;
         }
