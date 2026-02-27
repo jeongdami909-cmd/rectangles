@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Windows - Transparent & Opaque Blind</title>
+    <title>Windows - Light Gray Frosted Blind</title>
     <style>
         :root {
+            --indigo: #3f51b5;
             --btn-bg: rgba(255, 255, 255, 0.15);
-            --text-color: rgba(255, 255, 255, 0.95);
         }
 
         body {
@@ -18,7 +18,7 @@
             display: flex; flex-direction: column; align-items: center;
         }
 
-        /* 🌆 전체 배경 사진 (선명도 100%) */
+        /* 🌆 전체 배경 사진 */
         .site-bg {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background-size: cover; background-position: center;
@@ -33,7 +33,7 @@
             max-width: 300px;
         }
         .bg-admin label, .bg-admin button {
-            cursor: pointer; background: var(--btn-bg);
+            cursor: pointer; background: rgba(0, 0, 0, 0.4);
             color: rgba(255, 255, 255, 0.9); font-size: 11px;
             padding: 8px 14px; border-radius: 4px;
             backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
@@ -49,37 +49,38 @@
             box-sizing: border-box; z-index: 10;
         }
 
-        /* 🃏 개별 카드 (블라인드가 없을 땐 완전 투명하게) */
+        /* 🃏 개별 카드 (본체는 투명) */
         .card {
             position: relative; width: 100%; aspect-ratio: 3 / 4.5; 
             border-radius: 6px; overflow: hidden;
-            box-shadow: none; /* 그림자 완벽 제거 */
-            background: transparent; /* 배경색 완벽 제거 */
-            border: 1px solid rgba(255, 255, 255, 0.05); /* 위치 파악을 위한 아주 옅은 선 */
+            background: transparent;
+            border: 1px solid rgba(255, 255, 255, 0.1); /* 카드 테두리만 살짝 */
         }
 
-        /* 📸 사진 레이어 (검은 배경 제거, 투명) */
+        /* 📸 사진 레이어 (완전 투명) */
         .photo-layer { position: absolute; inset: 0; z-index: 1; background: transparent; }
         .photo-layer img { width: 100%; height: 100%; object-fit: cover; }
 
-        /* ⬛ 블라인드 레이어 (완전 불투명) */
+        /* 🌫️ 블라인드 레이어 (엷은 회색 반투명) */
         .blind-layer {
             position: absolute; inset: 0; z-index: 2;
-            background-color: #121212; /* 완전한 불투명 다크 색상 */
+            background-color: rgba(240, 240, 240, 0.35); /* 엷은 회색 반투명 */
+            backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); /* 서리가 낀 듯한 블러 효과 */
             display: flex; flex-direction: column; justify-content: flex-end; 
             padding: 25px 20px;
             transition: transform 0.7s cubic-bezier(0.65, 0, 0.15, 1); 
-            border-bottom: 2px solid rgba(255,255,255,0.1); 
+            border-bottom: 2px solid rgba(255,255,255,0.4); 
         }
 
         .card.lifted .blind-layer { transform: translateY(-100%); }
 
+        /* 📜 텍스트 에디터 (밝은 배경에 맞춰 어두운 글씨로 변경) */
         .blind-layer h3 {
-            margin: 0 0 10px 0; font-size: 1.1em; color: var(--text-color);
+            margin: 0 0 10px 0; font-size: 1.1em; color: var(--indigo);
             font-weight: 600; outline: none;
         }
         .blind-layer p {
-            margin: 0; font-size: 0.95em; line-height: 1.6; color: rgba(255,255,255,0.85);
+            margin: 0; font-size: 0.95em; line-height: 1.6; color: #222; /* 진한 회흑색 텍스트 */
             outline: none; white-space: pre-wrap;
             max-height: 150px; overflow-y: auto;
         }
@@ -88,27 +89,27 @@
         .btn-group {
             position: absolute; top: 10px; right: 10px; z-index: 10;
             display: flex; gap: 4px; flex-wrap: wrap; justify-content: flex-end; width: 80%;
-            opacity: 0.2; transition: opacity 0.3s;
+            opacity: 0; transition: opacity 0.3s; /* 평소엔 숨김 */
         }
         .card:hover .btn-group, .card:active .btn-group { opacity: 1; } 
 
         .mini-btn {
-            background: rgba(0,0,0,0.6); border: 1px solid rgba(255,255,255,0.2);
+            background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.2);
             color: rgba(255,255,255,0.9); font-size: 10px; padding: 5px 9px;
-            border-radius: 4px; cursor: pointer; 
+            border-radius: 4px; cursor: pointer; backdrop-filter: blur(4px);
         }
-        .mini-btn:hover { background: rgba(255,255,255,0.2); }
+        .mini-btn:hover { background: rgba(0,0,0,0.6); }
 
         .add-btn {
-            background: rgba(0,0,0,0.7); border: 1px solid rgba(255,255,255,0.3);
+            background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.3);
             color: #fff; padding: 12px 40px; border-radius: 30px; cursor: pointer;
-            font-size: 13px; letter-spacing: 1px;
-            margin-bottom: 50px; box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+            font-size: 13px; letter-spacing: 1px; backdrop-filter: blur(8px);
+            margin-bottom: 50px; box-shadow: 0 5px 15px rgba(0,0,0,0.3);
         }
 
         input[type="file"] { display: none; }
         ::-webkit-scrollbar { width: 4px; }
-        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.3); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.2); border-radius: 4px; }
     </style>
 </head>
 <body>
@@ -130,7 +131,7 @@
     const grid = document.getElementById('mainGrid');
     const bgLayer = document.getElementById('bgLayer');
 
-    // 🔧 이미지 자동 압축 함수 (Canvas 활용 - 용량 초과 완벽 방지)
+    // 🔧 이미지 자동 압축 함수
     function compressImage(file, maxWidth, quality, callback) {
         const reader = new FileReader();
         reader.onload = function(event) {
@@ -219,7 +220,6 @@
 
         grid.appendChild(card);
 
-        // 사진 첨부 시 자동 압축
         document.getElementById(`file-${id}`).addEventListener('change', (e) => {
             const file = e.target.files[0];
             if (file) {
@@ -232,27 +232,23 @@
         });
     }
 
-    // 🪟 블라인드 올리기/내리기
     function toggleBlind(id, e) {
         e.stopPropagation();
         document.getElementById(`card-${id}`).classList.toggle('lifted');
     }
 
-    // 📸 사진 넣기
     function triggerPhoto(id, e) {
         e.stopPropagation();
         document.getElementById(`file-${id}`).click();
     }
 
-    // ✍️ 수정
     function editContent(id, e) {
         e.stopPropagation();
         const card = document.getElementById(`card-${id}`);
-        card.classList.remove('lifted'); // 글을 써야 하니 블라인드를 내림
+        card.classList.remove('lifted');
         document.getElementById(`title-${id}`).focus();
     }
 
-    // 💾 고정(저장)
     function saveData(id, e) {
         e.stopPropagation();
         const imgEl = document.getElementById(`img-${id}`);
@@ -268,7 +264,6 @@
         }
     }
 
-    // 🗑️ 삭제
     function deleteBoard(id, e) {
         e.stopPropagation();
         if(confirm('이 기록을 지우시겠습니까?')) {
@@ -279,7 +274,6 @@
         }
     }
 
-    // ➕ 추가
     function addPair() {
         const id1 = nextId++;
         const id2 = nextId++;
@@ -291,7 +285,6 @@
         window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
     }
 
-    // 🚨 초기화
     function hardReset() {
         if(confirm('주의! 저장된 모든 사진과 글, 배경이 삭제됩니다. 초기화하시겠습니까?')) {
             localStorage.clear();
