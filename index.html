@@ -41,11 +41,11 @@
         }
         .bg-admin .danger-btn { color: #ff8a80; border-color: rgba(255,138,128,0.4); }
 
-        /* 🪟 갤러리 그리드 (2열) - 배경이 잘 보이도록 상단 여백 250px로 대폭 확대 */
+        /* 🪟 갤러리 그리드 (2열) - 화면의 절반 아래(55vh)부터 시작하도록 수정 */
         .gallery-grid {
             display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px;
             width: 100%; max-width: 600px; 
-            padding: 250px 20px 120px 20px; /* 기존 60px -> 250px */
+            padding: 55vh 20px 120px 20px; /* 기존 250px -> 55vh(화면 높이의 55%) 로 변경 */
             box-sizing: border-box; z-index: 10;
         }
 
@@ -118,7 +118,6 @@
 
 <div class="bg-admin">
     <label for="bgUpload">배경 변경</label>
-    <button onclick="fixBg()">배경 고정</button>
     <button class="danger-btn" onclick="hardReset()">🧹 전체 초기화</button>
     <input type="file" id="bgUpload" accept="image/*">
 </div>
@@ -168,20 +167,14 @@
         if (file) {
             compressImage(file, 1200, 0.7, (compressedUrl) => {
                 bgLayer.style.backgroundImage = `url(${compressedUrl})`;
+                try {
+                    localStorage.setItem('blind-bg-fixed', compressedUrl);
+                } catch(err) {
+                    alert('저장 공간이 부족하여 배경을 고정할 수 없습니다. [🧹 전체 초기화]를 진행해주세요.');
+                }
             });
         }
     });
-
-    function fixBg() {
-        const bgImg = bgLayer.style.backgroundImage;
-        if (bgImg && bgImg !== 'none') {
-            const url = bgImg.replace(/^url\(["']?/, '').replace(/["']?\)$/, '');
-            try {
-                localStorage.setItem('blind-bg-fixed', url);
-                alert('배경이 고정되었습니다.');
-            } catch(e) { alert('용량 초과로 저장할 수 없습니다. (전체 초기화 권장)'); }
-        }
-    }
 
     // 2. 게시판 리스트 관리
     let boardList = JSON.parse(localStorage.getItem('blind-board-list')) || [1, 2, 3, 4];
